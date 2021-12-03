@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-deploy
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nodejs  
+    spec:
+      containers: 
+      - name: NodeJS
+        image: devopsxebia/test:nodejs
+        ports:
+        - containerPort: 3000
