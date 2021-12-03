@@ -1,0 +1,39 @@
+pipeline {
+    agent {
+        node {
+            label 'linux-node'
+			//name of the agent attached with Jenkins master
+        }
+	parameters {
+         string(description: 'List of recipients to send email report', name: 'recipients', defaultValue: 'xyz@gmail.com')
+         string(description: 'repo branch_name', name: 'branch_name', defaultValue: 'main')
+            }
+	environment {
+              TAG = "${env.BUILD_NUMBER}"
+			  }
+    }
+    stages {
+       stage('Code Checkout'){
+	    steps {
+		  checkout([$class: 'GitSCM', branches: [[name: '*/${branch_name}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'LocalBranch', localBranch: "**"]], gitTool: 'Default', submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkadm-github-test', url: 'https://github.com/kiran316/nodeJS.git']]])
+		  }
+		 }
+        stage('Docker image build and push') {
+            steps {
+                script {
+				sh ' docker build -t node:TAG .
+                sh 'docker push devopsxebia/test:postgres${env.BUILD_NUMBER}"
+                }}
+				}
+
+          stage('Create Environment') {
+                            steps {
+                                sh "kubectl apply -f Deployment.yaml"
+                                sh "sleep 120"
+                                sh "kubectl get po"
+                            }
+                        }
+                        
+                        }
+                         }
+            
